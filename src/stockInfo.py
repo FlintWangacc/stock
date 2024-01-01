@@ -72,8 +72,8 @@ class StockInfo:
 
   def __str__(self):
       percentString = "{:.3%}".format(self.dividPerShare)
-      return "Name:{0}\tstockCode:{1}\tDividPerShare:{2}\n".format(self.stockName,
-              self.stockCode, percentString)
+      return "Name:{0}\tstockCode:{1}".format(
+              self.stockName, self.stockCode)
 
   def __getattr__(self, name):
     methodMap = {'currentPrice' : self.getCurrentPrice,
