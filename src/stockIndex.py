@@ -33,7 +33,7 @@ class StockIndex:
   def __str__(self):
     ps = ""
     for t in self.stockIndex:
-      ps += str(t)
+      ps += str(t) + '\t' #+ '{:.1%}'.format(self.stockToWeight[t])
     return ps
 
   def sortOnDivid(self):
