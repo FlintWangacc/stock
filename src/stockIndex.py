@@ -8,6 +8,8 @@ class StockIndex:
   def __init__(self, url):
     self.stockIndex = []
     self.stockToWeight = {}
+    self.dividends = {}
+    self.roe = {}
     exMap = {'Shanghai Stock Exchange':'SS',
              'Shenzhen Stock Exchange':'SZ'}
     response = requests.get(url)
@@ -29,6 +31,8 @@ class StockIndex:
         #print(stockCode, stockName, stockEx, stockWeight)
         self.stockIndex.append(s)
         self.stockToWeight[s] = stockWeight / 100;
+        self.dividends[s] = s.getDividendLast() / s.currentPrice
+        self.roe[s] = s.getROE()
 
   def __str__(self):
     ps = ""
