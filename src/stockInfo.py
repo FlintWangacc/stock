@@ -16,11 +16,23 @@ class StockInfo:
       self.stockInfo = yf.Ticker(self.stockSymbol)
       #self.currentPrice = None
       #self.lastDividend = None
+      self.financials = self.stockInfo.financials
+      self.balanceSheet = self.stockInfo.balance_sheet
     except Exception as e:
       print("An exception occured", str(e))
       traceback.print_exc()
       sys.exit(1)
       
+  def getROE(self):
+    try:
+      netIncome = self.financials.loc['Net Income Common Stockholders'].iloc[0]
+      shareholderEquity = self.balanceSheet.loc['Stockholders Equity'].iloc[0]
+      roe = netIncome / shareholderEquity
+      return roe
+
+    except KeyError as e:
+      print(f"KeyError: {e}.")
+
   def getDividendLast(self):
     try:
       return self.stockInfo.dividends.get(self.lastDividendDate, 0)
