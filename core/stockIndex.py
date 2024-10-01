@@ -2,7 +2,9 @@
 
 from stockInfo import StockInfo
 from io import BytesIO
+from stockInfo import NocurrentPrice
 import requests
+import traceback
 
 class StockIndex:
   def __init__(self, url):
@@ -24,15 +26,27 @@ class StockIndex:
 
       for _, row in df.iterrows():
         stockCode = row['成份券代码Constituent Code']
+        stockCode = str(stockCode).zfill(6)
+        #print(f"type:{type(stockCode)}")
         stockName = row['成份券名称Constituent Name']
         stockEx = row['交易所英文名称Exchange(Eng)']
         stockWeight = row['权重(%)weight']
-        s = StockInfo(stockCode, stockName, stockEx)
-        #print(stockCode, stockName, stockEx, stockWeight)
-        self.stockIndex.append(s)
-        self.stockToWeight[s] = stockWeight / 100;
-        self.dividends[s] = s.getDividendLast() / s.currentPrice
-        self.roe[s] = s.getROE()
+        try:
+          s = StockInfo(stockCode, stockName, stockEx)
+          #print(stockCode, stockName, stockEx, stockWeight)
+          self.stockIndex.append(s)
+          self.stockToWeight[s] = stockWeight / 100;
+          self.dividends[s] = s.getRateOfDividend()
+          #self.dividends[s] = s.getLastYearDividend()
+          self.roe[s] = s.getROE()
+        except NocurrentPrice as e:
+          print(f"{e.stockCode} has no NocurrentPrice")
+          self.stockToWeight.pop(s)
+          self.stockIndex = self.stockIndex[:-1]
+          continue
+        except Exception as e:
+          print(f"An error occurred {e}")
+          traceback.print_exc()
 
   def __str__(self):
     ps = ""
@@ -41,6 +55,7 @@ class StockIndex:
     return ps
 
   def sortOnDivid(self):
+    #pass
     self.stockIndex = sorted(self.stockIndex, key=lambda x:x.dividPerShare, reverse=True)
 
   def getIndexPE(self):
